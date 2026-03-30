@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bigiz — Visual Problem Solver</title>
     
-    <!-- Google Fonts: Inter for UI, Alex Brush for authentic signature style -->
+    <!-- Google Fonts: Inter for UI, Alex Brush for the authentic signature style -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Alex+Brush&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -117,6 +117,11 @@
 </head>
 <body class="selection:bg-seb-red selection:text-white">
 
+    <!-- Preloader / Entrance Animation -->
+    <div id="preloader" class="fixed inset-0 w-full h-full z-[10000] bg-seb-black flex items-center justify-center pointer-events-none">
+        <img src="icon-fill.png" alt="Bigiz Loading" class="w-16 h-16 object-contain">
+    </div>
+
     <div class="cursor-dot hidden md:block"></div>
     <div class="cursor-outline hidden md:block"></div>
 
@@ -135,18 +140,27 @@
     </nav>
 
     <!-- Faded Video Backdrop specifically for the Hero (Scrolls away as you move down) -->
-    <div class="absolute top-0 left-0 w-full h-[100svh] z-[-3] bg-black overflow-hidden">
-        <video autoplay loop muted playsinline class="w-full h-full object-cover opacity-30">
-            <source src="https://cdn.coverr.co/videos/coverr-gradient-colors-background-5026/1080p.mp4" type="video/mp4">
-        </video>
-        <div class="absolute inset-0 bg-black/60"></div>
+    <div class="absolute top-0 left-0 w-full h-[100svh] z-[-3] bg-black overflow-hidden pointer-events-none">
+        <!-- Native HTML5 Background Video (Faster, no UI, seamless loop) -->
+        <video 
+            id="hero-video"
+            src="hero.mp4" 
+            autoplay 
+            loop 
+            muted 
+            playsinline
+            class="absolute inset-0 w-full h-full object-cover opacity-30 grayscale"
+        ></video>
+        <!-- Overlay to ensure text readability -->
+        <div class="absolute inset-0 bg-black/60 pointer-events-none"></div>
     </div>
 
     <!-- Background Layer (Opacity & Color Controlled seamlessly by GSAP ScrollTrigger) -->
     <div id="fixed-background" class="fixed top-0 left-0 w-full h-full z-[-2]"></div>
 
     <div class="fixed top-0 left-0 w-full h-screen flex justify-center items-center z-[-1] pointer-events-none">
-        <h1 id="fixed-title-text" class="text-[14vw] leading-[0.85] font-black tracking-tighter text-white mix-blend-difference text-center uppercase">
+        <!-- MATCHED SIZE: text-[15vw] on mobile, scaling to text-[11vw] on desktop -->
+        <h1 id="fixed-title-text" class="text-[15vw] lg:text-[11vw] leading-[0.8] font-black tracking-tighter text-white mix-blend-difference text-center uppercase">
             Visual<br>
             Problem<br>
             Solver
@@ -157,28 +171,32 @@
 
         <section id="hero" class="min-h-[100svh] flex flex-col justify-center items-center px-6 md:px-10 pt-32 pb-20 text-center relative z-10 bg-transparent">
             
-            <div class="flex flex-col items-center gap-1 w-full">
-                <!-- Name heavily stylized, tightly spaced -->
-                <h2 id="signature-text" class="text-[2.5rem] md:text-[3.5rem] lg:text-[4.5rem] font-light font-script text-seb-red leading-none mb-1 capitalize overflow-hidden relative inline-block z-20">
-                    <span class="inline-block" style="clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);">Anass Biyguise</span>
+            <!-- Hidden Interactive 3D Grid (Hero Logo Shapes) -->
+            <div id="hero-grid" class="absolute inset-0 grid w-full h-full z-0 pointer-events-none"></div>
+
+            <div class="flex flex-col items-center w-full relative z-10">
+                <!-- Name heavily stylized, split into words for a hand-drawn writing effect. Restored negative margins to counter Alex Brush padding -->
+                <h2 id="signature-text" class="text-[3rem] sm:text-[4rem] md:text-[5rem] lg:text-[5.5rem] font-light font-script text-seb-red leading-relaxed capitalize relative inline-block z-10 -mb-4 md:-mb-6 lg:-mb-8 py-2 md:py-5">
+                    <span class="sig-word inline-block" style="clip-path: polygon(0% -20%, 0% -20%, -10% 120%, -10% 120%); padding-right: 0.15em;">Anass</span>
+                    <span class="sig-word inline-block" style="clip-path: polygon(0% -20%, 0% -20%, -10% 120%, -10% 120%);">Biyguise</span>
                 </h2>
                 
-                <!-- Invisible structural spacer -->
-                <h1 class="text-[14vw] leading-[0.85] font-black tracking-tighter uppercase opacity-0 select-none pointer-events-none my-1">
+                <!-- Invisible structural spacer perfectly matching the background text -->
+                <h1 class="text-[15vw] lg:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase opacity-0 select-none pointer-events-none my-0">
                     Visual<br>
                     Problem<br>
                     Solver
                 </h1>
 
-                <!-- Subtitle -->
-                <h2 class="hero-fade text-sm md:text-lg font-light tracking-[0.2em] uppercase text-seb-red max-w-2xl leading-relaxed mt-1">
+                <!-- Subtitle with corrected responsive text size (Replaced text-[15%]) -->
+                <h2 class="hero-fade text-[13px] sm:text-[14px] md:text-sm lg:text-base font-light tracking-[0.2em] uppercase text-seb-red max-w-2xl leading-relaxed mt-2 md:mt-4">
                     Based in Casablanca.<br>
                     Specializing in 3D, Branding,<br>
                     and Motion Design.
                 </h2>
 
-                <!-- Clickable Animated Arrow -->
-                <button onclick="lenis.scrollTo('#work-section', {offset: 0})" class="hero-fade mt-6 animate-bounce cursor-pointer z-20 focus:outline-none group">
+                <!-- Clickable Animated Arrow maintaining the exact same uniform fixed gap -->
+                <button onclick="lenis.scrollTo('#work-section', {offset: 0})" class="hero-fade mt-8 md:mt-10 animate-bounce cursor-pointer z-20 focus:outline-none group">
                     <div class="p-3 bg-black/40 backdrop-blur-xl border border-white/20 rounded-full text-white shadow-lg group-hover:bg-seb-red group-hover:border-seb-red transition-all group-hover:scale-110">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -231,7 +249,7 @@
 
                         <!-- Project 1 -->
                         <div class="w-[75vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card">
-                            <a href="armani.html" class="block group relative w-full h-full">
+                            <a href="#" class="block group relative w-full h-full">
                                 <div class="relative mb-5">
                                     <div class="overflow-hidden rounded-2xl aspect-[4/5] relative z-10 bg-gray-200 shadow-2xl">
                                         <img src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=800&auto=format&fit=crop" 
@@ -440,9 +458,12 @@
         <div class="h-[15vh] md:h-[20vh] w-full pointer-events-none bg-transparent"></div>
 
         <!-- Footer -->
-        <footer id="contact" class="px-6 md:px-10 py-20 min-h-[80vh] flex flex-col justify-between relative z-20 bg-seb-black text-white">
+        <footer id="contact" class="px-6 md:px-10 py-20 min-h-[80vh] flex flex-col justify-between relative z-20 bg-seb-black text-white overflow-hidden">
             
-            <div class="gsap-reveal flex flex-col md:flex-row justify-between items-start w-full gap-16 md:gap-4">
+            <!-- Hidden Interactive Grid (Logo Shapes) -->
+            <div id="footer-grid" class="absolute inset-0 grid w-full h-full z-0 pointer-events-none"></div>
+
+            <div class="gsap-reveal flex flex-col md:flex-row justify-between items-start w-full gap-16 md:gap-4 relative z-10">
                 
                 <div class="flex flex-col">
                     <span class="uppercase tracking-widest text-sm font-bold mb-4 text-gray-400">Have an idea?</span>
@@ -455,19 +476,19 @@
 
                 <!-- Footer Social Links Vertically Aligned on the Right -->
                 <div class="flex flex-col items-start md:items-end gap-2 md:mt-12 w-full md:w-auto">
-                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md">instagram.</a>
-                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md">linkedin.</a>
-                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md">mail.</a>
-                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md">phone.</a>
-                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md">experimental.</a>
+                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md pointer-events-auto">instagram.</a>
+                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md pointer-events-auto">linkedin.</a>
+                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md pointer-events-auto">mail.</a>
+                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md pointer-events-auto">phone.</a>
+                    <a href="#" class="px-5 py-2.5 text-[11px] md:text-xs bg-zinc-800 text-white rounded-full hover:bg-seb-red transition-all duration-300 hover:scale-110 shadow-md pointer-events-auto">experimental.</a>
                 </div>
             </div>
 
-            <div class="gsap-reveal flex flex-col md:flex-row justify-between items-end gap-10 mt-20">
-                <div class="text-xs font-bold uppercase tracking-widest text-gray-400">
+            <div class="gsap-reveal flex flex-col md:flex-row justify-between items-end gap-10 mt-20 relative z-10">
+                <div class="text-xs font-bold uppercase tracking-widest text-gray-400 pointer-events-auto">
                     Casablanca, MA
                 </div>
-                <div class="text-right">
+                <div class="text-right pointer-events-auto">
                     <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">
                         Designed & Built<br>by Bigiz®
                     </p>
@@ -487,6 +508,12 @@
 
     <script>
         // --- 0. Smooth Scrolling Setup (Lenis) ---
+        // Force scroll to top on page load and prevent browser scroll memory
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         const lenis = new Lenis({
             duration: 1.5,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
@@ -498,6 +525,9 @@
             touchMultiplier: 2,
             infinite: false,
         });
+
+        // Pause scrolling during entrance animation
+        lenis.stop();
 
         lenis.on('scroll', ScrollTrigger.update);
         gsap.ticker.add((time) => { lenis.raf(time * 1000); });
@@ -557,13 +587,79 @@
         // --- 3. GSAP Master Animations ---
         gsap.registerPlugin(ScrollTrigger);
 
-        // A1. Signature Write Animation (Immediate Load)
-        gsap.to("#signature-text span", {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            duration: 2.5,
-            ease: "power2.inOut",
-            delay: 0.2
+        // =========================================================
+        // ENTRANCE ANIMATION (Preloader & Site Slide Up)
+        // =========================================================
+        const introTl = gsap.timeline({
+            paused: true, // FIX: Start paused, wait for Vimeo to load!
+            onComplete: () => {
+                lenis.start(); // Re-enable scrolling after entrance
+                ScrollTrigger.refresh(); // FIX: Recalculate pin positions after layout settles
+            }
         });
+
+        // 1. Preloader slides up out of view after the video is ready
+        introTl.to("#preloader", {
+            yPercent: -100,
+            duration: 1.2,
+            ease: "expo.inOut",
+            delay: 0.5 // Small buffer so the logo doesn't vanish instantly on fast connections
+        })
+        // 2. The entire website slides up into place smoothly
+        .fromTo(["main", "nav", "#fixed-title-text", ".absolute.top-0"], {
+            y: 80,
+        }, {
+            y: 0,
+            duration: 1.2,
+            ease: "expo.out",
+            clearProps: "transform" // FIX: Removes the transform so the horizontal scroll pinning works correctly
+        }, "-=0.8")
+        // 3. Signature writes itself (Hand-drawn slanted wipe with pen lift pause)
+        .to(".sig-word", {
+            clipPath: "polygon(0% -20%, 120% -20%, 110% 120%, 0% 120%)",
+            duration: 0.8,
+            ease: "power2.inOut",
+            stagger: 0.3
+        }, "-=0.6")
+        // 4. "Visual Problem Solver" text fades in
+        .from("#fixed-title-text", {
+            duration: 1.5,
+            scale: 0.9,
+            opacity: 0,
+            ease: "power4.out"
+        }, "-=1")
+        // 5. Bio and button fade in
+        .fromTo(".hero-fade", 
+            { autoAlpha: 0, y: 30 },
+            { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.2, ease: "power3.out" },
+            "-=1.2"
+        );
+
+        // =========================================================
+        // NATIVE VIDEO PRELOADER SYNC LOGIC
+        // =========================================================
+        const bgVideo = document.getElementById('hero-video');
+        let siteStarted = false;
+
+        function startSiteAnimation() {
+            if (!siteStarted) {
+                siteStarted = true;
+                introTl.play();
+            }
+        }
+
+        // Listen for the exact moment the native video starts playing
+        if (bgVideo) {
+            bgVideo.addEventListener('playing', startSiteAnimation);
+            
+            // Failsafe for Safari/Cached videos: if it's already ready, start immediately
+            if (bgVideo.readyState >= 3) {
+                startSiteAnimation();
+            }
+        }
+
+        // Failsafe: If the user's device is slow, force the site to show up after 4 seconds anyway.
+        setTimeout(startSiteAnimation, 4000);
 
         // =========================================================
         // IMPORTANT: Pinning must be declared BEFORE elements below 
@@ -621,12 +717,6 @@
             }
         });
 
-        // C. Immediate Load Animations for Hero Section
-        gsap.fromTo(".hero-fade", 
-            { autoAlpha: 0, y: 30 },
-            { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.2, ease: "power3.out", delay: 0.5 }
-        );
-
         // D. Scroll Triggered Storytelling (For general text reveals)
         gsap.utils.toArray(".gsap-reveal").forEach(element => {
             gsap.fromTo(element, 
@@ -662,14 +752,195 @@
             }
         );
 
-        // F. Mix-Blend Title Intro
-        gsap.from("#fixed-title-text", {
-            duration: 2,
-            scale: 0.9,
-            opacity: 0,
-            ease: "power4.out",
-            delay: 0.3
+        // --- 4. Footer Playful Grid Interaction (Logo Hover Reveal) ---
+        const footerElement = document.getElementById('contact');
+        const footerGrid = document.getElementById('footer-grid');
+        let footerGridCols = 0;
+        let footerGridRows = 0;
+        let footerCellArray = [];
+
+        function initFooterGrid() {
+            footerGrid.innerHTML = '';
+            footerCellArray = [];
+            const cellSize = window.innerWidth < 768 ? 40 : 60; // Grid density based on screen
+            
+            footerGridCols = Math.ceil(footerElement.offsetWidth / cellSize);
+            footerGridRows = Math.ceil(footerElement.offsetHeight / cellSize);
+            
+            footerGrid.style.gridTemplateColumns = `repeat(${footerGridCols}, 1fr)`;
+            footerGrid.style.gridTemplateRows = `repeat(${footerGridRows}, 1fr)`;
+            
+            const totalCells = footerGridCols * footerGridRows;
+            
+            // Build the grid containing the custom logo shape
+            for (let i = 0; i < totalCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'w-full h-full flex items-center justify-center';
+                cell.innerHTML = `
+                    <svg viewBox="0 0 100 100" class="w-[50%] h-[50%] opacity-0 transform">
+                        <!-- Precise SVG recreating your logo shape -->
+                        <path fill="currentColor" d="M 0 0 L 100 0 A 50 50 0 0 1 0 0 Z M 0 100 L 100 100 A 50 50 0 0 0 0 100 Z" />
+                    </svg>
+                `;
+                footerGrid.appendChild(cell);
+                footerCellArray.push(cell.querySelector('svg'));
+            }
+        }
+
+        // Setup mathematical hover logic for Footer
+        footerElement.addEventListener('mousemove', (e) => {
+            const rect = footerElement.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const actualCellWidth = footerElement.offsetWidth / footerGridCols;
+            const actualCellHeight = footerElement.offsetHeight / footerGridRows;
+            
+            const col = Math.floor(x / actualCellWidth);
+            const row = Math.floor(y / actualCellHeight);
+            
+            const index = row * footerGridCols + col;
+            
+            if (index >= 0 && index < footerCellArray.length) {
+                const svg = footerCellArray[index];
+                
+                // Animate if it's not currently animating
+                if (!svg.dataset.animating) {
+                    svg.dataset.animating = "true";
+                    gsap.killTweensOf(svg);
+                    
+                    // Pop in with random 2D rotation direction to make it playful
+                    gsap.fromTo(svg, 
+                        { opacity: 1, scale: 0, rotation: gsap.utils.random([-90, 90]), color: "#E60000" },
+                        { opacity: 1, scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" }
+                    );
+                    
+                    // Fade out & spin away smoothly
+                    gsap.to(svg, {
+                        opacity: 0,
+                        scale: 0.2,
+                        rotation: gsap.utils.random([-180, 180]),
+                        color: "#333333", // Fades to a dark grey before disappearing
+                        duration: 1,
+                        delay: 0.3,
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            svg.dataset.animating = "";
+                        }
+                    });
+                }
+            }
         });
+
+
+        // --- 5. Hero 3D Playful Grid Interaction ---
+        const heroElement = document.getElementById('hero');
+        const heroGrid = document.getElementById('hero-grid');
+        let heroGridCols = 0;
+        let heroGridRows = 0;
+        let heroCellArray = [];
+
+        function initHeroGrid() {
+            heroGrid.innerHTML = '';
+            heroCellArray = [];
+            const cellSize = window.innerWidth < 768 ? 40 : 60; 
+            
+            heroGridCols = Math.ceil(heroElement.offsetWidth / cellSize);
+            heroGridRows = Math.ceil(heroElement.offsetHeight / cellSize);
+            
+            heroGrid.style.gridTemplateColumns = `repeat(${heroGridCols}, 1fr)`;
+            heroGrid.style.gridTemplateRows = `repeat(${heroGridRows}, 1fr)`;
+            
+            const totalCells = heroGridCols * heroGridRows;
+            
+            for (let i = 0; i < totalCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'w-full h-full flex items-center justify-center';
+                // Apply 3D perspective to the container of the SVG
+                cell.style.perspective = '500px';
+                cell.innerHTML = `
+                    <svg viewBox="0 0 100 100" class="w-[50%] h-[50%] opacity-0 transform" style="transform-style: preserve-3d;">
+                        <path fill="currentColor" d="M 0 0 L 100 0 A 50 50 0 0 1 0 0 Z M 0 100 L 100 100 A 50 50 0 0 0 0 100 Z" />
+                    </svg>
+                `;
+                heroGrid.appendChild(cell);
+                heroCellArray.push(cell.querySelector('svg'));
+            }
+        }
+
+        // Setup mathematical hover logic for Hero (with 3D rotations)
+        heroElement.addEventListener('mousemove', (e) => {
+            const rect = heroElement.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const actualCellWidth = heroElement.offsetWidth / heroGridCols;
+            const actualCellHeight = heroElement.offsetHeight / heroGridRows;
+            
+            const col = Math.floor(x / actualCellWidth);
+            const row = Math.floor(y / actualCellHeight);
+            
+            const index = row * heroGridCols + col;
+            
+            if (index >= 0 && index < heroCellArray.length) {
+                const svg = heroCellArray[index];
+                
+                if (!svg.dataset.animating) {
+                    svg.dataset.animating = "true";
+                    gsap.killTweensOf(svg);
+                    
+                    // Pop in with wild 3D tumbling rotation
+                    gsap.fromTo(svg, 
+                        { 
+                            opacity: 1, 
+                            scale: 0, 
+                            rotationX: gsap.utils.random(-180, 180), 
+                            rotationY: gsap.utils.random(-180, 180), 
+                            rotationZ: gsap.utils.random(-90, 90), 
+                            color: "#E60000" 
+                        },
+                        { 
+                            opacity: 1, 
+                            scale: 1, 
+                            rotationX: 0, 
+                            rotationY: 0, 
+                            rotationZ: 0, 
+                            duration: 0.6, 
+                            ease: "back.out(2)" 
+                        }
+                    );
+                    
+                    // Tumble away and fade out
+                    gsap.to(svg, {
+                        opacity: 0,
+                        scale: 0.2,
+                        rotationX: gsap.utils.random(-180, 180),
+                        rotationY: gsap.utils.random(-180, 180),
+                        rotationZ: gsap.utils.random(-180, 180),
+                        color: "#ffffff", // Fades out to white in the hero area
+                        duration: 1.2,
+                        delay: 0.2,
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            svg.dataset.animating = "";
+                        }
+                    });
+                }
+            }
+        });
+
+        // Rebuild grids on resize to maintain perfect squares
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimer);
+            window.resizeTimer = setTimeout(() => {
+                initFooterGrid();
+                initHeroGrid();
+            }, 300);
+        });
+
+        // Initialize grids on load
+        initFooterGrid();
+        initHeroGrid();
 
     </script>
 </body>
