@@ -133,21 +133,37 @@
                 
                 <!-- Thumbnails (Vertical on Desktop, Horizontal on Mobile) -->
                 <div class="flex flex-row lg:flex-col gap-4 w-full lg:w-24 flex-shrink-0 overflow-x-auto lg:overflow-y-auto no-scrollbar pb-2 lg:pb-0 z-10">
-                    <button onclick="changeMainImage('https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1200&auto=format&fit=crop', this)" class="thumb-btn w-20 lg:w-full aspect-square bg-white border-2 border-seb-black p-1 hover:border-seb-red transition-all flex-shrink-0 focus:outline-none">
+                    
+                    <!-- Video Thumbnail (Notice the 'vimeo' parameter and the play icon) -->
+                    <button onclick="changeMainMedia('vimeo', 'https://player.vimeo.com/video/76979871?title=0&byline=0&portrait=0&autoplay=1', this)" class="thumb-btn relative w-20 lg:w-full aspect-square bg-white border-2 border-seb-black p-1 hover:border-seb-red transition-all flex-shrink-0 focus:outline-none">
                         <img src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover">
+                        <!-- Play Icon Overlay -->
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/30 m-1">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        </div>
                     </button>
-                    <button onclick="changeMainImage('https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1200&auto=format&fit=crop', this)" class="thumb-btn w-20 lg:w-full aspect-square bg-white border-2 border-transparent p-1 hover:border-seb-red transition-all flex-shrink-0 focus:outline-none opacity-60 hover:opacity-100">
+                    
+                    <!-- Image Thumbnails (Notice the 'image' parameter) -->
+                    <button onclick="changeMainMedia('image', 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=1200&auto=format&fit=crop', this)" class="thumb-btn w-20 lg:w-full aspect-square bg-white border-2 border-transparent p-1 hover:border-seb-red transition-all flex-shrink-0 focus:outline-none opacity-60 hover:opacity-100">
                         <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover grayscale">
                     </button>
-                    <button onclick="changeMainImage('https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=1200&auto=format&fit=crop', this)" class="thumb-btn w-20 lg:w-full aspect-square bg-white border-2 border-transparent p-1 hover:border-seb-red transition-all flex-shrink-0 focus:outline-none opacity-60 hover:opacity-100">
+                    
+                    <button onclick="changeMainMedia('image', 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=1200&auto=format&fit=crop', this)" class="thumb-btn w-20 lg:w-full aspect-square bg-white border-2 border-transparent p-1 hover:border-seb-red transition-all flex-shrink-0 focus:outline-none opacity-60 hover:opacity-100">
                         <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover grayscale">
                     </button>
                 </div>
 
-                <!-- Main Featured Image -->
+                <!-- Main Featured Media -->
                 <div class="flex-1 flex items-center justify-center relative w-full h-[50vh] lg:h-full pb-10 lg:pb-0">
-                    <!-- Drop shadow mimics the product depth from the reference. Rounded corners removed. -->
-                    <img id="main-image" src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?q=80&w=1200&auto=format&fit=crop" alt="Treino Wod Featured" class="max-w-[85%] max-h-[85%] object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105">
+                    
+                    <!-- 1. The Image Container (Hidden if video is active) -->
+                    <img id="main-image" src="" alt="Treino Wod Featured" class="hidden max-w-[85%] max-h-[85%] object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105">
+                    
+                    <!-- 2. The Video Container (Active by default for this example) -->
+                    <div id="main-video-wrapper" class="w-[90%] md:w-[85%] aspect-video relative drop-shadow-2xl">
+                        <iframe id="main-video" src="https://player.vimeo.com/video/76979871?title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen class="absolute top-0 left-0 w-full h-full bg-black"></iframe>
+                    </div>
+
                 </div>
             </div>
 
@@ -381,11 +397,26 @@
     </button>
 
     <script>
-        // --- Thumbnail Swap Logic ---
-        function changeMainImage(src, btn) {
-            document.getElementById('main-image').src = src;
+        // --- Thumbnail Swap Logic (Now supports Images and Vimeo) ---
+        function changeMainMedia(type, src, btn) {
+            const imgEl = document.getElementById('main-image');
+            const vidWrapper = document.getElementById('main-video-wrapper');
+            const vidEl = document.getElementById('main-video');
+
+            if (type === 'image') {
+                // Show Image, Hide Video
+                imgEl.src = src;
+                imgEl.classList.remove('hidden');
+                vidWrapper.classList.add('hidden');
+                vidEl.src = ''; // Clear video source to stop it from playing in the background
+            } else if (type === 'vimeo') {
+                // Show Video, Hide Image
+                vidEl.src = src;
+                vidWrapper.classList.remove('hidden');
+                imgEl.classList.add('hidden');
+            }
             
-            // Reset all thumbnails
+            // Reset all thumbnails styles
             const thumbs = document.querySelectorAll('.thumb-btn');
             thumbs.forEach(t => {
                 t.classList.add('opacity-60', 'border-transparent');
