@@ -87,6 +87,18 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* FIX: Marquee Animation CSS added back in */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 25s linear infinite;
+            will-change: transform;
+        }
+
         .gsap-reveal { visibility: hidden; }
 
         /* Modal specific body state */
@@ -223,18 +235,20 @@
                         
                         <!-- Minimalist text indicator for scrolling -->
                         <div class="ml-auto text-xs font-bold uppercase tracking-widest text-seb-red">
-                            (SCROLL)
+                            (SCROLL/SWIPE)
                         </div>
                     </div>
                 </div>
 
                 <!-- Horizontal Slider Wrapper -->
-                <div class="pl-6 md:pl-10 w-full overflow-visible mt-10">
-                    <div id="work-slider" class="flex flex-row flex-nowrap gap-10 md:gap-16 w-max items-center pb-10 pt-10">
+                <!-- FIX: Added native horizontal scrolling for mobile (overflow-x-auto, snap-x) -->
+                <div id="slider-wrapper" class="w-full overflow-x-auto md:overflow-visible mt-10 no-scrollbar snap-x snap-mandatory touch-pan-x pl-0 md:pl-10">
+                    <!-- Adjusted padding and gaps for native mobile scroll -->
+                    <div id="work-slider" class="flex flex-row flex-nowrap gap-6 md:gap-16 w-max items-center pb-10 pt-10 px-6 md:px-0">
 
                         <!-- Project 1: Treino Wod -->
-                        <!-- Added 'relative group cursor-pointer' to the outer static wrapper -->
-                        <div class="w-[75vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer">
+                        <!-- Added snap-center and widened slightly (w-[85vw]) for mobile -->
+                        <div class="w-[85vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer snap-center">
                             
                             <!-- THE FIX: Invisible absolute link that never scales, guaranteeing perfect touch accuracy -->
                             <a href="treino-wod/project.html" class="absolute inset-0 z-50 block" aria-label="View Treino Wod"></a>
@@ -270,7 +284,7 @@
                         </div>
 
                         <!-- Project 2: Visual Engine -->
-                        <div class="w-[75vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer">
+                        <div class="w-[85vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer snap-center">
                             
                             <!-- THE FIX: Invisible absolute link -->
                             <a href="visual-engine/project.html" class="absolute inset-0 z-50 block" aria-label="View Visual Engine"></a>
@@ -305,7 +319,7 @@
                         </div>
 
                         <!-- Project 3: Neon Interface -->
-                        <div class="w-[75vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer">
+                        <div class="w-[85vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer snap-center">
                             
                             <!-- THE FIX: Invisible absolute link -->
                             <a href="neon-interface/project.html" class="absolute inset-0 z-50 block" aria-label="View Neon Interface"></a>
@@ -340,7 +354,7 @@
                         </div>
 
                         <!-- Project 4: Mono Clay -->
-                        <div class="w-[75vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer">
+                        <div class="w-[85vw] md:w-[35vw] lg:w-[25vw] flex-shrink-0 project-card relative group cursor-pointer snap-center">
                             
                             <!-- THE FIX: Invisible absolute link -->
                             <a href="mono-clay/project.html" class="absolute inset-0 z-50 block" aria-label="View Mono Clay"></a>
@@ -375,8 +389,8 @@
                         </div>
                         
                         <!-- Extra padding element to ensure we can scroll fully past the last slide so it hits the focus zone -->
-                        <!-- Reduced from 60vw to 40vw to shorten the dead-space at the end of the scroll -->
-                        <div class="w-[40vw] flex-shrink-0"></div>
+                        <!-- FIX: Hidden on mobile so it doesn't leave a massive blank space at the end of the swipe -->
+                        <div class="hidden md:block w-[40vw] flex-shrink-0"></div>
 
                     </div>
                 </div>
@@ -754,44 +768,68 @@
         // it so GSAP calculates the trigger start positions correctly.
         // =========================================================
 
-        // B. Horizontal Scroll For "Selected Works"
+        // B. Responsive Horizontal Scroll Logic (GSAP on Desktop, Native Swipe on Mobile)
         let workSlider = document.getElementById("work-slider");
-        
-        let scrollTween = gsap.to(workSlider, {
-            x: () => -(workSlider.scrollWidth - window.innerWidth),
-            ease: "none",
-            scrollTrigger: {
-                trigger: "#work-section",
-                pin: true,
-                start: "top top",
-                end: () => "+=" + workSlider.scrollWidth,
-                scrub: 1,
-                invalidateOnRefresh: true
-            }
+        let mm = gsap.matchMedia();
+
+        mm.add("(min-width: 768px)", () => {
+            // DESKTOP: Pin the section and scrub horizontally based on vertical scroll
+            let scrollTween = gsap.to(workSlider, {
+                x: () => -(workSlider.scrollWidth - window.innerWidth),
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#work-section",
+                    pin: true,
+                    start: "top top",
+                    end: () => "+=" + workSlider.scrollWidth,
+                    scrub: 1,
+                    invalidateOnRefresh: true
+                }
+            });
+
+            // Desktop Focus effect (Scale up as it enters from the right)
+            gsap.utils.toArray(".project-card").forEach((card) => {
+                const inner = card.querySelector('.card-inner');
+                gsap.fromTo(inner, 
+                    { opacity: 0.3, scale: 0.75, transformOrigin: "left center" }, 
+                    {
+                        opacity: 1, 
+                        scale: 1,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: card,
+                            containerAnimation: scrollTween,
+                            start: "left 85%",
+                            end: "left 10%",
+                            scrub: true,
+                        }
+                    }
+                );
+            });
         });
 
-        // Focus effect for project cards inside the horizontal scroll
-        gsap.utils.toArray(".project-card").forEach((card) => {
-            // Target the INNER wrapper so we don't mess with the flex container's layout size
-            const inner = card.querySelector('.card-inner');
-            
-            // Enter from right small and faded, grow to full size on the left
-            // CHANGED: transformOrigin to "left center" so alignment stays mathematically perfect on the left edge
-            gsap.fromTo(inner, 
-                { opacity: 0.3, scale: 0.75, transformOrigin: "left center" }, 
-                {
-                    opacity: 1, 
-                    scale: 1,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: card, // The static parent remains the trigger point
-                        containerAnimation: scrollTween,
-                        start: "left 85%", // Start scaling when entering from the right
-                        end: "left 10%",   // Finish scaling when locked into the focus area on the left
-                        scrub: true,
+        mm.add("(max-width: 767px)", () => {
+            // MOBILE: Release the pin, allow native touch swiping horizontally!
+            // Add a subtle focus effect driven by the native horizontal scroll wrapper
+            gsap.utils.toArray(".project-card").forEach((card) => {
+                const inner = card.querySelector('.card-inner');
+                gsap.fromTo(inner, 
+                    { opacity: 0.4, scale: 0.9 }, 
+                    {
+                        opacity: 1, 
+                        scale: 1,
+                        ease: "power1.out",
+                        scrollTrigger: {
+                            trigger: card,
+                            scroller: "#slider-wrapper", // Listen to the native scrolling container
+                            horizontal: true,            // Tracks horizontal movement instead of vertical
+                            start: "left 85%",
+                            end: "center center",
+                            scrub: true,
+                        }
                     }
-                }
-            );
+                );
+            });
         });
 
         // A. Seamless Background Color Engine 
